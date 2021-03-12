@@ -5,10 +5,13 @@ import os
 
 from peewee import *
 
+# Initializing the database and name
 db = SqliteDatabase("inventory.db")
 
 
+# Create Product Model for our app
 class Product(Model):
+    # Setting the attributes to the proper fields for the Product Model
     product_id = AutoField(primary_key=True)
     product_name = CharField(max_length=255, unique=True)
     product_quantity = IntegerField()
@@ -19,12 +22,13 @@ class Product(Model):
         database = db
 
 
+# Initializing our database to connect and create_tables
 def initialize():
     db.connect()
     db.create_tables([Product], safe=True)
-    db.close()
 
 
+# Function to clear the screen for cleaner readability after each action
 def clear():
     os.system('cls' if os.name == 'nt' else 'clear')
 
@@ -33,7 +37,8 @@ def read_csv():
     # Opening the inventory.csv file
     with open("inventory.csv") as csv_file:
         reader = csv.DictReader(csv_file, delimiter=",")
-        product_row = list(reader)
+        item_rows = list(reader)
+        return item_rows
 
 
 def menu():
@@ -59,8 +64,14 @@ def menu():
             user_menu[choice]()
 
 
-def view():
+def view(search_query=None):
     """View product details"""
+    products = Product.select().order_by(Product.product_id)
+    if search_query:
+        products = products.where(Product.content.contains(search_query))
+    for product in products:
+        clear()
+        print(product.content)
 
 
 def add_new_product():
@@ -80,5 +91,6 @@ user_menu = OrderedDict([
 
 if __name__ == "__main__":
     initialize()
+    clear()
     backup_data()
 
