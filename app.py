@@ -5,16 +5,13 @@ import os
 
 from peewee import *
 
-# Initializing the database and name
 db = SqliteDatabase("inventory.db")
 
 
-# Create Product Model for our app
 class Product(Model):
-    # Setting the attributes to the proper fields for the Product Model
-    product_id = AutoField(primary_key=True)
-    product_name = TextField()
-    product_quantity = IntegerField(default=0)
+    product_id = PrimaryKeyField()
+    product_name = CharField(max_length=255, unique=True)
+    product_quantity = IntegerField()
     product_price = IntegerField()
     date_updated = DateTimeField(datetime.datetime.now())
 
@@ -25,73 +22,91 @@ class Product(Model):
 def initialize():
     db.connect()
     db.create_tables([Product], safe=True)
+    read_csv()
+    menu()
 
 
-# Function to clear the screen for cleaner readability after each action
 def clear():
     os.system('cls' if os.name == 'nt' else 'clear')
 
 
 def read_csv():
-    # Opening and reading the inventory.csv file
     with open("inventory.csv", newline="") as csv_file:
         reader = csv.DictReader(csv_file, delimiter=",")
-        products = list(reader)
-        for product in products:
-            add_new_product(product)
+        rows = list(reader)
+        for row in rows:
+            row["product_price"] = int(row["product_price"].replace("$", "").replace(".", ""))
+            row["product_quantity"] = int(row["product_quantity"])
+            row["date_updated"] = (datetime.datetime.strptime(row["date_updated"], "%m/%d/%Y"))
+            try:
+                Product.create(
+                    product_name=row["product_name"],
+                    product_price=row["product_price"],
+                    product_quantity=row["product_quantity"],
+                    date_updtaed=row["date_updated"]).save()
+            except IntegrityError:
+                product_record = Product.get(product_name=row["product_name"])
+                product_record.product_name = row["product_name"]
+                product_record.product_price = row["product_price"]
+                product_record.product_quantity = row["product_quantity"]
+                product_record.date_updated = row["date_updated"]
+                product_record.save()
+                if product_record != row["product_name"]:
+                    product_record.update(product_record.date_updated)
 
 
 def menu():
-    # Setting our choice variable to None
     choice = None
-    # Starting the while loop to see if the user has chosen "x" to quit
-    clear()
     while choice != "x":
         print("="*22)
-        # We print out this message to let them know they can type "x" to quit
         print("ENTER 'x' TO EXIT.")
         print("="*22)
         print()
-        # Loop through each item in our dictionary, the key and the value
         for key, value in user_menu.items():
-            # Then we are gonna print out the key and the values ex: key= A)  value= Add an entry
             print("{}) {}".format(key, value.__doc__))
-        # Asking the user to choose an option,we also lowercase it
         print()
         print("=" * 22)
-        choice = input("ENTER AN OPTION [v/a/b]: ").lower()
-        # We check if it's "x" if it's not "x" we come back to our menu, we find the function
-        # they have selected and we run it
+        choice = input("ENTER AN OPTION: ").lower()
         if choice in user_menu.keys():
             clear()
             user_menu[choice]()
-        elif choice != "x":
-            print("\nThat's not a valid option, Try Again")
-            print()
+        elif choice not in user_menu:
+            print("\nINVALID OPTION. TRY AGAIN.")
+            continue
 
 
 def add_new_product():
-    """Add new product"""
+    """Add New Product"""
 
 
-def view():
-    """View products"""
+def view_products(search_query=None):
+    """View Product Entries"""
     clear()
-    products = Product.select().order_by(Product.date_updated.desc())
-    product_unmatched = True
-    while product_unmatched:
-        product_search = int(input("Select a Product ID to view: "))
+    products = Product.select().order_by(Product.product_id.desc())
+    if search_query:
+        products = Product.select().where(Product.product_id == search_query)
         for product in products:
-            if product_search == product.product_id:
-                print(f"Product ID#: {product.product_id}"
-                      f"Last Updated: {datetime.datetime.strptime(product.date_updated, '%d-%m-%Y')}"
-                      f"Product Name: {product.product_name}"
-                      f"Product Quantity: {product.product_quantity}"
-                      f"Product Price: {product.product_price} cents")
-                return
+            clear()
+            print("="*22)
+            print(
+                f"Product ID#: {product.product_id}"
+                f"Product Name: {product.product_name}"
+                f"Product Quantity: {product.product_quantity}"
+                f"Product Price: {product.product_price} cents"
+                f"Last Updated: {product.date_updated.strftime('%d-%m-%Y')}")
+            print("="*22)
+            print("\n")
+            print("n) Next Product")
+            print("x) Main Menu")
+            print("\n")
+            option = input("\nENTER AN OPTION: ")
+            if option == "x":
+                break
+            elif option == "n":
+                clear()
             else:
-                print("The product ID you entered does not match any in the database!")
-                return product_search
+                print("INVALID OPTION. TRY AGAIN")
+                continue
 
 
 def backup_data():
@@ -99,7 +114,7 @@ def backup_data():
 
 
 user_menu = OrderedDict([
-    ("v", view),
+    ("v", view_products),
     ("a", add_new_product),
     ("b", backup_data),
 ])
@@ -107,6 +122,3 @@ user_menu = OrderedDict([
 
 if __name__ == "__main__":
     initialize()
-    read_csv()
-    menu()
-    backup_data()
