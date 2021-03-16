@@ -71,7 +71,6 @@ def clear():
 
 # Remembered how this was done from the "Using Databases in Python" Treehouse course
 def menu():
-    clear()
     while True:
         choice = None
         print("=" * 36)
@@ -93,6 +92,7 @@ def menu():
 # # Remembered how this was done from the "Using Databases in Python" Treehouse course
 def view_product():
     """View Products In Inventory"""
+    clear()
     items = Product.select().order_by(Product.product_id.asc())
     for product in items:
         clear()
@@ -124,7 +124,7 @@ def delete(product):
         print("\nThe Product Has Been Deleted!\n")
 
 
-# Was struggling with this search functions. Found the solution from a fellow Pythonista on GitHub.com
+# Was struggling with this search function. Found the solution from a fellow Pythonista on GitHub.com
 # https://github.com/daniellerg/CSV_Inventory_App/blob/main/app.py
 # Was during the weekend and had nobody to ask on the Slack channel
 def search_inventory():
@@ -138,7 +138,7 @@ def search_inventory():
         else:
             try:
                 # This part here below in particular was what I didn't have that changed this whole function
-                # to work correctly
+                # to work correctly "product = Product.get(id_search)" is what I had originally
                 product = Product.get_by_id(id_search)
             except Product.DoesNotExist:
                 print("\nINVALID ID #. TRY AGAIN")
@@ -222,7 +222,7 @@ def backup_inventory():
             for product in backup_csv:
                 backup_writer.writerow({
                     "product_name": product.product_name,
-                    "product_price": "$" + "{}".format(product.product_price),
+                    "product_price": str("$" + "{}".format(product.product_price / 100)),
                     "product_quantity": product.product_quantity,
                     "date_updated": product.date_updated.strftime("%m/%d/%Y")
                 })
