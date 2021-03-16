@@ -87,7 +87,7 @@ def menu():
             clear()
             menu_dict[choice]()
         elif choice not in menu_dict:
-            print("\nINVALID INPUT. See menu options\n")
+            print("\nINVALID INPUT. See 'MENU' options\n")
 
 
 # Remembered how this was done from the "Using Databases in Python" Treehouse course,
