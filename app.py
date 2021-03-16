@@ -86,49 +86,13 @@ def menu():
             clear()
             menu_dict[choice]()
         elif choice not in menu_dict:
-            print("\nINVALID INPUT. See menu options")
+            print("\nINVALID INPUT. See menu options\n")
 
 
-# # Remembered how this was done from the "Using Databases in Python" Treehouse course
+# Remembered how this was done from the "Using Databases in Python" Treehouse course,
+# well part of it anyway
 def view_product():
     """View Products In Inventory"""
-    clear()
-    items = Product.select().order_by(Product.product_id.asc())
-    for product in items:
-        clear()
-        print("=" * 36)
-        print()
-        print(f"Product ID: {product.product_id}\n"
-              f"Product Name: {product.product_name}\n"
-              f"Product Price: {product.product_price} (cents)\n"
-              f"Product Quantity: {product.product_quantity}\n"
-              f"Last Updated:", product.date_updated.strftime("%m/%d/%Y"), "\n")
-        print("=" * 36)
-        print()
-        print("Press (Enter) For Next Product\n")
-        print("d) Delete Product")
-        print("x) Return To Main Menu")
-        print()
-        print("=" * 36)
-        choice = input("    ENTER AN OPTION: ").lower().strip()
-        if choice == "x":
-            clear()
-            break
-        elif choice == "d":
-            delete(product)
-
-
-def delete(product):
-    if input("\nVerify You Want To 'DELETE' This Product. (y/n) ").lower() != "n":
-        Product.delete_instance(product)
-        print("\nThe Product Has Been Deleted!\n")
-
-
-# Was struggling with this search function. Found the solution from a fellow Pythonista on GitHub.com
-# https://github.com/daniellerg/CSV_Inventory_App/blob/main/app.py
-# Was during the weekend and had nobody to ask on the Slack channel
-def search_inventory():
-    """Search by Product ID"""
     clear()
     while True:
         try:
@@ -137,24 +101,45 @@ def search_inventory():
             print("\nINVALID INPUT. TRY AGAIN")
         else:
             try:
+                # Seen a conversation between Danielle Gabriszeski and Jennifer Nordell about this solution
                 # This part here below in particular was what I didn't have that changed this whole function
                 # to work correctly "product = Product.get(id_search)" is what I had originally
                 product = Product.get_by_id(id_search)
             except Product.DoesNotExist:
                 print("\nINVALID ID #. TRY AGAIN")
             else:
-                clear()
+                print("=" * 36)
+                print()
                 print("Product Search Results:\n")
                 print(f"Product ID: {product.product_id}\n"
                       f"Product Name: {product.product_name}\n"
                       f"Product Price: {product.product_price} (cents)\n"
                       f"Product Quantity: {product.product_quantity}\n"
                       f"Last Updated:", product.date_updated.strftime("%m/%d/%Y"), "\n")
-                if input("Continue Searching? (y/n) ").lower() == "n":
+                print("=" * 36)
+                print()
+                print("d) Delete Product")
+                print("c) Continue Search")
+                print("x) Return To Main Menu")
+                print()
+                print("=" * 36)
+                choice = input("    ENTER AN OPTION: ").lower().strip()
+                if choice == "x":
                     clear()
                     break
+                elif choice == "d":
+                    delete(product)
+                elif choice == "c":
+                    view_product()
                 else:
-                    continue
+                    print("\nINVALID INPUT. TRY AGAIN\n")
+                    view_product()
+
+
+def delete(product):
+    if input("\nVerify You Want To 'DELETE' This Product. (y/n) ").lower() != "n":
+        Product.delete_instance(product)
+        print("\nThe Product Has Been Deleted!\n")
 
 
 def add_new_product():
@@ -174,20 +159,20 @@ def add_new_product():
         else:
             break
     while True:
-        product_price = input("\nProduct Price: ex(1.99=199)cents: ").strip()
-        try:
-            float(product_price)
-            break
-        except ValueError:
-            print("\nINVALID INPUT. TRY AGAIN")
-            continue
-    while True:
         product_quantity = input("\nProduct Quantity: ")
         try:
             product_quantity = str(int(product_quantity))
             break
         except ValueError:
             print("\nINVALID INPUT. USE NUMBERS ONLY")
+            continue
+    while True:
+        product_price = input("\nProduct Price: ex(1.99=199)cents: ").strip()
+        try:
+            float(product_price)
+            break
+        except ValueError:
+            print("\nINVALID INPUT. TRY AGAIN")
             continue
     product_updated = datetime.datetime.today()
     today = product_updated.strftime("%m/%d/%Y")
@@ -209,7 +194,7 @@ def add_new_product():
             load_csv()
 
 
-# Found a great explanation on the link below on how to do this the right way
+# Found an explanation on the link below on how to do this the right way
 # https://www.programiz.com/python-programming/writing-csv-files
 def backup_inventory():
     """Backup Store Inventory"""
@@ -220,6 +205,9 @@ def backup_inventory():
             backup_writer.writeheader()
             backup_csv = Product.select().order_by(Product.product_id.asc())
             for product in backup_csv:
+                # Jennifer Nordell gave me a hint on how to turn the price into a str in this part of the
+                # backup_inventory function. Before when backing up the inventory there was no decimal in
+                # the price of the new backup.csv file
                 backup_writer.writerow({
                     "product_name": product.product_name,
                     "product_price": str("$" + "{}".format(product.product_price / 100)),
@@ -239,7 +227,6 @@ menu_dict = OrderedDict([
     ("v", view_product),
     ("a", add_new_product),
     ("b", backup_inventory),
-    ("s", search_inventory),
     ("x", exit_program)
 ])
 
