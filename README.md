@@ -10,8 +10,8 @@ This project was to build a console application that loads an existing
 store's inventory data from a CSV file into a SQlite database. The application
 will allow a user to interact with the inventory. They will have 5 options, 
 1) View products in the inventory 
-  1) In the view products option, there is an option to delete a product
-  2) Or return back to the main menu 
+  In the view products option, there is an option to delete a product
+  Or return back to the main menu 
 3) Add new products to the inventory
 4) Backup the store inventory into a new csv file
 5) Search inventory by procudt ID
