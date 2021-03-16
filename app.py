@@ -71,6 +71,7 @@ def clear():
 
 # Remembered how this was done from the "Using Databases in Python" Treehouse course
 def menu():
+    clear()
     while True:
         choice = None
         print("=" * 36)
@@ -126,7 +127,7 @@ def view_product():
                 choice = input("    ENTER AN OPTION: ").lower().strip()
                 if choice == "x":
                     clear()
-                    break
+                    menu()
                 elif choice == "d":
                     delete(product)
                 elif choice == "c":
@@ -140,6 +141,8 @@ def delete(product):
     if input("\nVerify You Want To 'DELETE' This Product. (y/n) ").lower() != "n":
         Product.delete_instance(product)
         print("\nThe Product Has Been Deleted!\n")
+        clear()
+        menu()
 
 
 def add_new_product():
@@ -176,7 +179,8 @@ def add_new_product():
             continue
     product_updated = datetime.datetime.today()
     today = product_updated.strftime("%m/%d/%Y")
-    print(f"\nPlease Check The Information Input:"
+    print("=" * 36)
+    print(f"\nPlease Double Check The Information:"
           f"\n"
           f"\nProduct Name: {product_name}"
           f"\nProduct Price: {product_price}"
@@ -190,8 +194,8 @@ def add_new_product():
         with open("inventory.csv", "a") as new_file:
             new_file.write("\n"+product_name+","+product_price+","+product_quantity+","+today)
             print("\nProduct Successfully Saved To Inventory!\n")
-            print("=" * 36)
             load_csv()
+            menu()
 
 
 # Found an explanation on the link below on how to do this the right way
@@ -205,7 +209,7 @@ def backup_inventory():
             backup_writer.writeheader()
             backup_csv = Product.select().order_by(Product.product_id.asc())
             for product in backup_csv:
-                # Jennifer Nordell gave me a hint on how to turn the price into a str in this part of the
+                # Jennifer Nordell gave me a hint that the price needed to be turned into a str in this part of the
                 # backup_inventory function. Before when backing up the inventory there was no decimal in
                 # the price of the new backup.csv file
                 backup_writer.writerow({
