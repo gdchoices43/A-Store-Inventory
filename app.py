@@ -30,6 +30,8 @@ def initializer():
     db.close()
 
 
+# Seen a great explanation on https://realpython.com/python-csv/ this site helped me understand
+# what's going on here
 def load_csv():
     with open("inventory.csv") as csv_file:
         reader = csv.DictReader(csv_file, delimiter=",")
@@ -182,12 +184,15 @@ def add_new_product():
         with open("inventory.csv", "a") as new_file:
             new_file.write("\n"+product_name+","+"$"+product_price+","+product_quantity+","+today)
             print("\nProduct Successfully Saved To Inventory!\n")
-            load_csv()
-            menu()
+        # Thanks to Mel R {They/Them} for helping me figure out why the new product added wasn't searchable until
+        # after I rebooted the program. I had the function calls inside the "with" and once I un-indented them to
+        # being lined up with the "with" it started working properly
+        load_csv()
+        menu()
 
 
-# Found an explanation on the link below on how to do this the right way
-# https://www.programiz.com/python-programming/writing-csv-files
+# Seen a great explanation on https://realpython.com/python-csv/ this site helped me understand
+# what's going on here
 def backup_inventory():
     """Backup Store Inventory"""
     if input("Backup The Inventory? (y/n) ").lower() == "y":
@@ -209,6 +214,7 @@ def backup_inventory():
             print("\nThe Store Inventory Was Backed Up Successfully!\n")
 
 
+# I added this just for fun. I like the OrderedDict and wanted to have more options in there
 def exit_program():
     """Exit Store Inventory"""
     print("\nExiting Store Inventory....")
