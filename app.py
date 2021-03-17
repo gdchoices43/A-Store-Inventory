@@ -207,14 +207,14 @@ def backup_inventory():
                 # the price of the new backup.csv file
                 backup_writer.writerow({
                     "product_name": product.product_name,
-                    "product_price": str("${}".format(product.product_price / 100)),
+                    "product_price": ("${}".format(format(product.product_price / 100, ".2f"))),
                     "product_quantity": product.product_quantity,
                     "date_updated": product.date_updated.strftime("%m/%d/%Y")
                 })
             print("\nThe Store Inventory Was Backed Up Successfully!\n")
 
 
-# I added this just for fun. I like the OrderedDict and wanted to have more options in there
+# I added this just for fun. I like the OrderedDict and wanted to have the Exit options in there
 def exit_program():
     """Exit Store Inventory"""
     print("\nExiting Store Inventory....")
