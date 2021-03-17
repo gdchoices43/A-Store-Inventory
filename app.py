@@ -102,6 +102,8 @@ def view_product():
             print("\nINVALID INPUT. TRY AGAIN")
         else:
             try:
+                # I was working on my project on the weekend and was trying to figure out why my search wasn't
+                # working so I was looking through Slack to see if anyone else had this same issue and I
                 # Seen a conversation between Danielle Gabriszeski and Jennifer Nordell about this solution
                 # This part here below in particular was what I didn't have that changed this whole function
                 # to work correctly "product = Product.get(id_search)" is what I had originally
@@ -119,7 +121,6 @@ def view_product():
                       f"Last Updated:", product.date_updated.strftime("%m/%d/%Y"), "\n")
                 print("=" * 36)
                 print()
-                print("d) Delete Product")
                 print("c) Continue Search")
                 print("x) Return To Main Menu")
                 print()
@@ -128,21 +129,11 @@ def view_product():
                 if choice == "x":
                     clear()
                     menu()
-                elif choice == "d":
-                    delete(product)
                 elif choice == "c":
                     view_product()
                 else:
                     print("\nINVALID INPUT. TRY AGAIN\n")
                     view_product()
-
-
-def delete(product):
-    if input("\nVerify You Want To 'DELETE' This Product. (y/n) ").lower() != "n":
-        Product.delete_instance(product)
-        print("\nThe Product Has Been Deleted!\n")
-        clear()
-        menu()
 
 
 def add_new_product():
@@ -170,9 +161,9 @@ def add_new_product():
             print("\nINVALID INPUT. USE NUMBERS ONLY")
             continue
     while True:
-        product_price = input("\nProduct Price: ex(1.99=199)cents: ").strip()
+        product_price = input("\nProduct Price: ").strip()
         try:
-            float(product_price)
+            str(product_price)
             break
         except ValueError:
             print("\nINVALID INPUT. TRY AGAIN")
@@ -183,7 +174,7 @@ def add_new_product():
     print(f"\nPlease Double Check The Information:"
           f"\n"
           f"\nProduct Name: {product_name}"
-          f"\nProduct Price: {product_price}"
+          f"\nProduct Price: ${product_price}"
           f"\nProduct Quantity: {product_quantity}"
           f"\n")
     print("=" * 36)
@@ -192,7 +183,7 @@ def add_new_product():
         # I knew most of it but there were a few things I picked up from the explanation
         # https://www.kite.com/python/answers/how-to-append-to-a-csv-file-in-python
         with open("inventory.csv", "a") as new_file:
-            new_file.write("\n"+product_name+","+product_price+","+product_quantity+","+today)
+            new_file.write("\n"+product_name+","+"$"+product_price+","+product_quantity+","+today)
             print("\nProduct Successfully Saved To Inventory!\n")
             load_csv()
             menu()
