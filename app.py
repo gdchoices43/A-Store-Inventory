@@ -207,7 +207,7 @@ def backup_inventory():
                 # the price of the new backup.csv file
                 backup_writer.writerow({
                     "product_name": product.product_name,
-                    "product_price": str("$" + "{}".format(product.product_price / 100)),
+                    "product_price": str("${}".format(product.product_price / 100)),
                     "product_quantity": product.product_quantity,
                     "date_updated": product.date_updated.strftime("%m/%d/%Y")
                 })
