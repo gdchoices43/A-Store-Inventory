@@ -139,9 +139,6 @@ def view_product():
 def add_new_product():
     """Add Products to Inventory"""
     clear()
-    print("=" * 36)
-    print("PRESS ctrl+d WHEN FINISHED")
-    print("=" * 36)
     print("\n")
     while True:
         product_name = input("Product Name: ")
