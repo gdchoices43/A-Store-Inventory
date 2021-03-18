@@ -36,6 +36,8 @@ def load_csv():
         reader = csv.DictReader(csv_file, delimiter=",")
         rows = list(reader)
         for row in rows:
+            # Mel R {they/them} pointed out I had this line below stored as a float not an integer.
+            # I was able to make the change rather easily to fix this to satisfy the project requirement
             row["product_price"] = int(row["product_price"].replace("$", "").replace(".", ""))
             row["product_quantity"] = int(row["product_quantity"])
             row["date_updated"] = datetime.datetime.strptime(row["date_updated"], "%m/%d/%Y")
@@ -161,6 +163,9 @@ def add_new_product():
     while True:
         product_price = input("\nProduct Price: $ ").strip()
         try:
+            # Mel R {they/them} caught this error during a review prior to submit. Thank you Mel R {they/them}
+            # I originally had the line below written out as "float(product_price)" which didn't catch the
+            # a ValueError if the user input anything other than numbers.
             product_price = str(float(product_price))
             break
         except ValueError:
