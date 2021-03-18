@@ -38,7 +38,8 @@ def load_csv():
         for row in rows:
             # Mel R {they/them} pointed out I had this line below stored as a float not an integer.
             # I was able to make the change rather easily to fix this to satisfy the project requirement
-            row["product_price"] = int(row["product_price"].replace("$", "").replace(".", ""))
+            # by wrapping this statement below in an int() method.
+            row["product_price"] = int(float(row["product_price"].replace("$", "")) * 100)
             row["product_quantity"] = int(row["product_quantity"])
             row["date_updated"] = datetime.datetime.strptime(row["date_updated"], "%m/%d/%Y")
             try:
