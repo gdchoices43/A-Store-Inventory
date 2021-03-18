@@ -27,17 +27,16 @@ class Product(Model):
 def initializer():
     db.connect()
     db.create_tables([Product], safe=True)
-    db.close()
 
 
 # Seen a great explanation on https://realpython.com/python-csv/ this site helped me understand
 # what's going on here
 def load_csv():
-    with open("inventory.csv") as csv_file:
+    with open("inventory.csv", newline="") as csv_file:
         reader = csv.DictReader(csv_file, delimiter=",")
         rows = list(reader)
         for row in rows:
-            row["product_price"] = float(row["product_price"].replace("$", "")) * 100
+            row["product_price"] = int(row["product_price"].replace("$", "").replace(".", ""))
             row["product_quantity"] = int(row["product_quantity"])
             row["date_updated"] = datetime.datetime.strptime(row["date_updated"], "%m/%d/%Y")
             try:
@@ -152,7 +151,7 @@ def add_new_product():
         else:
             break
     while True:
-        product_quantity = input("\nProduct Quantity: ")
+        product_quantity = input("\nProduct Quantity: ").strip()
         try:
             product_quantity = str(int(product_quantity))
             break
@@ -160,22 +159,22 @@ def add_new_product():
             print("\nINVALID INPUT. USE NUMBERS ONLY")
             continue
     while True:
-        product_price = input("\nProduct Price: ").strip()
+        product_price = input("\nProduct Price: $ ").strip()
         try:
-            str(product_price)
+            product_price = str(float(product_price))
             break
         except ValueError:
-            print("\nINVALID INPUT. TRY AGAIN")
+            print("\nINVALID INPUT. USE NUMBERS ONLY")
             continue
     product_updated = datetime.datetime.today()
     today = product_updated.strftime("%m/%d/%Y")
     print("=" * 36)
-    print(f"\nPlease Double Check The Information:"
-          f"\n"
-          f"\nProduct Name: {product_name}"
-          f"\nProduct Price: ${product_price}"
-          f"\nProduct Quantity: {product_quantity}"
-          f"\n")
+    print("\nPlease Double Check The Information:")
+    print("\n")
+    print(f"\nProduct Name: {product_name}")
+    print(f"\nProduct Quantity: {product_quantity}")
+    print(f"\nProduct Price: ${product_price}")
+    print("\n")
     print("=" * 36)
     if input("\nSave To Inventory? (y/n) ").lower() == "y":
         # Got the solution on the website below on how to use the correct format to add items to csv file
@@ -214,7 +213,7 @@ def backup_inventory():
             print("\nThe Store Inventory Was Backed Up Successfully!\n")
 
 
-# I added this just for fun. I like the OrderedDict and wanted to have the Exit options in there
+# I added this just for fun. I like the OrderedDict and wanted to have the Exit option in there
 def exit_program():
     """Exit Store Inventory"""
     print("\nExiting Store Inventory....")
